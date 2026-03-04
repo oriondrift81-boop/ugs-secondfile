@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UGS Files</title>
+    <title>UGS Files - JOSHY Edition</title>
     <style>
         html { scroll-behavior: smooth; }
 
@@ -106,6 +106,7 @@
         .controls-row {
             display: flex;
             justify-content: center;
+            flex-wrap: wrap;
             gap: 10px;
             align-items: center;
             margin-top: 15px;
@@ -138,7 +139,6 @@
             scroll-margin-top: 20px;
         }
 
-        /* DEFAULT LIST VIEW */
         .buttons-container { 
             display: flex; 
             flex-direction: column; 
@@ -158,10 +158,7 @@
 
         .game-item { position: relative; width: 100%; max-width: 600px; transition: transform 0.2s; }
         
-        /* Grid Item Adjustments */
-        .grid-view .game-item {
-            max-width: none;
-        }
+        .grid-view .game-item { max-width: none; }
 
         .grid-view input[type="button"] {
             height: 100px;
@@ -173,12 +170,6 @@
             font-weight: bold;
             white-space: normal;
             line-height: 1.2;
-        }
-
-        .grid-view .star {
-            top: 10px;
-            right: 10px;
-            transform: none;
         }
 
         input[type="button"] {
@@ -218,6 +209,8 @@
             <button class="top-btn" id="view-toggle" onclick="toggleView()">田 Grid View</button>
             <button class="top-btn dice-btn" onclick="playRandomGame()" title="Random Game">🎲</button>
             <button class="top-btn" id="theme-toggle" onclick="toggleTheme()">🌙 Mode</button>
+            <button class="top-btn" id="delete-mode-toggle" onclick="toggleDeleteMode()" style="background: #ff4444; color: white;">🗑️ Delete Mode: OFF</button>
+            <button class="top-btn" onclick="resetDeletedGames()" style="background: #44ff44; color: #1a1a1a;">🔄 Undo All</button>
         </div>
     </div>
 
@@ -233,61 +226,65 @@
 
 <script>
     let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+    let deleteMode = false;
+    let deletedGames = JSON.parse(localStorage.getItem("deletedGames") || "[]");
 
     // PANIC KEY: Redirect to Canvas on ESC
     document.addEventListener('keydown', (e) => {
-        if (e.key === "Escape") {
-            window.location.href = "https://canvas.instructure.com";
-        }
+        if (e.key === "Escape") window.location.href = "https://canvas.instructure.com";
     });
 
-    // VIEW TOGGLE LOGIC (Grid vs List)
+    // DELETE MODE LOGIC
+    function toggleDeleteMode() {
+        deleteMode = !deleteMode;
+        const btn = document.getElementById('delete-mode-toggle');
+        btn.innerText = deleteMode ? "🗑️ Delete Mode: ON" : "🗑️ Delete Mode: OFF";
+        btn.style.boxShadow = deleteMode ? "0 0 20px #ff4444" : "none";
+    }
+
+    function resetDeletedGames() {
+        if (confirm("Restore all hidden games?")) {
+            localStorage.removeItem("deletedGames");
+            location.reload();
+        }
+    }
+
+    function applyDeletions() {
+        document.querySelectorAll(".game-item").forEach(item => {
+            const btn = item.querySelector("input[type='button']");
+            if (btn && deletedGames.includes(btn.value)) {
+                item.style.display = "none";
+            }
+        });
+    }
+
+    // VIEW TOGGLE
     function toggleView() {
         const content = document.getElementById('main-content');
         const btn = document.getElementById('view-toggle');
         const isGrid = content.classList.toggle('grid-view');
-        
         localStorage.setItem("viewMode", isGrid ? "grid" : "list");
         btn.innerText = isGrid ? "☰ List View" : "田 Grid View";
     }
 
-    // Load Saved View
     if (localStorage.getItem("viewMode") === "grid") {
         document.getElementById('main-content').classList.add('grid-view');
         document.getElementById('view-toggle').innerText = "☰ List View";
     }
 
-    // SEARCH FILTER LOGIC
+    // SEARCH
     function filterGames() {
         const query = document.getElementById('game-search').value.toLowerCase();
         const gameItems = document.querySelectorAll('#sections-container .game-item');
         
         gameItems.forEach(item => {
             const btn = item.querySelector('input[type="button"]');
-            const isMatch = btn.value.toLowerCase().includes(query);
+            const isMatch = btn.value.toLowerCase().includes(query) && !deletedGames.includes(btn.value);
             item.style.display = isMatch ? "block" : "none";
         });
-
-        const sections = document.querySelectorAll('#sections-container > div');
-        sections.forEach(section => {
-            const items = section.querySelectorAll('.game-item');
-            let hasVisible = false;
-            items.forEach(i => { if(i.style.display !== "none") hasVisible = true; });
-            section.style.display = hasVisible ? "block" : "none";
-        });
     }
 
-    // RANDOM GAME LOGIC
-    function playRandomGame() {
-        const allBtns = document.querySelectorAll("#sections-container input[type='button']");
-        const visibleBtns = Array.from(allBtns).filter(b => b.closest('.game-item').style.display !== "none");
-        if (visibleBtns.length > 0) {
-            const randomIndex = Math.floor(Math.random() * visibleBtns.length);
-            visibleBtns[randomIndex].click();
-        }
-    }
-
-    // THEME LOGIC
+    // THEME
     function toggleTheme() {
         const currentTheme = document.documentElement.getAttribute("data-theme");
         const newTheme = currentTheme === "light" ? "dark" : "light";
@@ -298,14 +295,8 @@
 
     const savedTheme = localStorage.getItem("theme") || "dark";
     document.documentElement.setAttribute("data-theme", savedTheme);
-    window.onload = () => {
-        document.getElementById("theme-toggle").innerText = savedTheme === "light" ? "☀️ Mode" : "🌙 Mode";
-    };
 
-    function goFullscreen() {
-        window.open(window.location.href, '_blank');
-    }
-
+    // FAVORITES
     function toggleFavorite(btnValue) {
         if (favorites.includes(btnValue)) {
             favorites = favorites.filter(f => f !== btnValue);
@@ -317,18 +308,11 @@
         renderFavorites();
     }
 
-    function updateStarUI() {
-        document.querySelectorAll(".game-item").forEach(item => {
-            const btn = item.querySelector("input[type='button']");
-            const star = item.querySelector(".star");
-            if (btn && star) star.classList.toggle("favorited", favorites.includes(btn.value));
-        });
-    }
-
     function renderFavorites() {
         const container = document.getElementById("favorites-container");
         container.innerHTML = "";
         favorites.forEach(name => {
+            if (deletedGames.includes(name)) return;
             const allBtns = [...document.querySelectorAll("#sections-container input[type='button']")];
             const original = allBtns.find(btn => btn.value === name);
             if (original) {
@@ -347,23 +331,29 @@
         });
     }
 
-    function buildSidebarNav() {
-        const sidebar = document.getElementById("sidebar-nav");
-        sidebar.innerHTML = "";
-        const headers = document.querySelectorAll(".letter-header");
-        headers.forEach(header => {
-            const letter = header.innerText.trim();
-            if (letter.length === 1) {
-                header.id = "section-" + letter;
-                const navLink = document.createElement("a");
-                navLink.href = "#section-" + letter;
-                navLink.className = "nav-letter";
-                navLink.innerText = letter;
-                sidebar.appendChild(navLink);
-            }
+    function updateStarUI() {
+        document.querySelectorAll(".game-item .star").forEach(star => {
+            const btn = star.parentElement.querySelector("input[type='button']");
+            if (btn) star.classList.toggle("favorited", favorites.includes(btn.value));
         });
     }
 
+    // SIDEBAR
+    function buildSidebarNav() {
+        const sidebar = document.getElementById("sidebar-nav");
+        sidebar.innerHTML = "";
+        document.querySelectorAll(".letter-header").forEach(header => {
+            const letter = header.innerText.trim();
+            header.id = "section-" + letter;
+            const navLink = document.createElement("a");
+            navLink.href = "#section-" + letter;
+            navLink.className = "nav-letter";
+            navLink.innerText = letter;
+            sidebar.appendChild(navLink);
+        });
+    }
+
+    // INITIALIZE BUTTONS
     function enhanceButtons() {
         const buttons = document.querySelectorAll("#sections-container input[type='button']");
         buttons.forEach(btn => {
@@ -372,18 +362,37 @@
             wrapper.className = "game-item";
             btn.parentNode.insertBefore(wrapper, btn);
             wrapper.appendChild(btn);
+
+            // Add Star
             const star = document.createElement("span");
             star.innerHTML = "★";
             star.className = "star";
             star.onclick = (e) => { e.stopPropagation(); toggleFavorite(btn.value); };
             wrapper.appendChild(star);
+
+            // Add Delete Interceptor
+            const originalClick = btn.onclick;
+            btn.onclick = (e) => {
+                if (deleteMode) {
+                    e.preventDefault();
+                    if (confirm(`Hide ${btn.value} permanently?`)) {
+                        deletedGames.push(btn.value);
+                        localStorage.setItem("deletedGames", JSON.stringify(deletedGames));
+                        applyDeletions();
+                        renderFavorites();
+                    }
+                } else if (originalClick) {
+                    originalClick.call(btn, e);
+                }
+            };
         });
         buildSidebarNav();
         updateStarUI();
+        applyDeletions();
         renderFavorites();
     }
 
-    setTimeout(enhanceButtons, 1000);
+    setTimeout(enhanceButtons, 1200);
 </script>
 
 </body>
