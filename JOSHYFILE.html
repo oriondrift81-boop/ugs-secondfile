@@ -10,17 +10,15 @@
         /* THEME VARIABLES */
         :root {
             --bg-gradient: linear-gradient(135deg, #2e1a47 0%, #3f1f66 100%);
-            --sidebar-bg: rgba(30, 0, 50, 0.7);
             --text-color: #ffffff;
             --accent-color: #d8b4ff;
             --btn-bg: linear-gradient(145deg, #7b2cbf, #5a189a);
             --btn-hover: linear-gradient(145deg, #9d4edd, #7b2cbf);
-            --card-shadow: rgba(0,0,0,0.4);
+            --delete-red: #ff4444;
         }
 
         [data-theme="light"] {
             --bg-gradient: linear-gradient(135deg, #f0f2f5 0%, #c9ced6 100%);
-            --sidebar-bg: rgba(200, 200, 200, 0.8);
             --text-color: #1a1a1a;
             --accent-color: #5a189a;
             --btn-bg: linear-gradient(145deg, #5a189a, #3c096c);
@@ -33,36 +31,40 @@
             color: var(--text-color);
             min-height: 100vh;
             margin: 0; padding: 0;
-            display: flex;
+            display: block;
             overflow-x: hidden;
             transition: background 0.3s ease;
         }
 
-        /* CLICK PARTICLES */
-        .particle {
-            position: fixed; top: 0; left: 0; width: 8px; height: 8px;
-            background: var(--accent-color); border-radius: 50%;
-            pointer-events: none; z-index: 9999;
-            transition: transform 0.6s ease-out, opacity 0.6s ease-out;
+        /* STICKY HEADER */
+        .header-container { 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            background: var(--bg-gradient); 
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
         }
 
-        /* SIDEBAR */
-        .sidebar {
-            position: fixed; left: 0; top: 0; width: 60px; height: 100vh;
-            background: var(--sidebar-bg); backdrop-filter: blur(12px);
-            padding: 20px 5px; display: flex; flex-direction: column;
-            align-items: center; gap: 5px; z-index: 1000;
+        .search-container {
+            margin: 15px auto 0;
+            width: 90%;
+            max-width: 500px;
         }
 
-        .nav-letter {
-            color: var(--accent-color); text-decoration: none; font-weight: bold;
-            font-size: 14px; padding: 8px; width: 30px; text-align: center;
-            border-radius: 5px; transition: 0.2s;
+        #gameSearch {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: 2px solid var(--accent-color);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            outline: none;
+            font-size: 16px;
         }
 
-        /* MAIN CONTENT */
-        .main-content { margin-left: 80px; flex: 1; padding: 20px; }
-        .header-container { text-align: center; margin-bottom: 30px; }
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .controls-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
 
         .top-btn {
@@ -71,67 +73,47 @@
             cursor: pointer; transition: 0.3s;
         }
 
-        /* ADDITIONAL INFO OVERLAY */
-        #info-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-gradient); z-index: 2000;
-            display: none; padding: 50px; box-sizing: border-box;
-            overflow-y: auto;
-        }
-        .close-info { position: absolute; top: 20px; right: 30px; font-size: 40px; cursor: pointer; color: var(--accent-color); }
-
-        /* GAME STYLES (LIST & GRID) */
-        .buttons-container { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+        /* GAME ITEMS */
+        .game-item { position: relative; width: 100%; max-width: 600px; margin: 0 auto 10px; }
         
         .grid-view .buttons-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 15px; align-items: stretch; width: 100%;
+            gap: 15px; width: 100%;
         }
 
-        .game-item { position: relative; width: 100%; max-width: 600px; }
-        .grid-view .game-item { max-width: none; }
-        
         input[type="button"] {
             background: var(--btn-bg); border: none; padding: 15px 45px 15px 20px;
             font-size: 16px; border-radius: 10px; cursor: pointer;
             width: 100%; color: white; text-align: left; transition: 0.2s;
         }
 
-        .grid-view input[type="button"] {
-            height: 100px; text-align: center; padding: 10px;
-            display: flex; align-items: center; justify-content: center;
-            white-space: normal; line-height: 1.2;
+        /* RED HIGHLIGHT FOR MULTI-DELETE */
+        .game-item.selected-delete input[type="button"] {
+            background: var(--delete-red) !important;
+            box-shadow: 0 0 15px var(--delete-red);
         }
 
         .star { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 20px; cursor: pointer; color: rgba(255,255,255,0.3); z-index: 5; }
         .star.favorited { color: gold; }
 
-        .letter-header {
-            color: var(--accent-color); font-size: 32px; margin: 40px 0 20px 0;
-            border-bottom: 2px solid var(--accent-color);
+        .letter-header { color: var(--accent-color); font-size: 32px; margin: 40px 0 20px 0; border-bottom: 2px solid var(--accent-color); text-align: center; }
+
+        #info-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-gradient); z-index: 2000;
+            display: none; padding: 50px; box-sizing: border-box;
+            overflow-y: auto;
         }
     </style>
 </head>
 <body onclick="createParticles(event)">
 
 <div id="info-overlay">
-    <span class="close-info" onclick="toggleInfo()">×</span>
-    <h1 style="color: var(--accent-color); border-bottom: 2px solid var(--accent-color);">ADDITIONAL INFO</h1>
-    <div style="font-size: 18px; line-height: 1.6; max-width: 800px;">
-        <p>This page includes features of the site and how to use them</p>
-        <ul>
-            <li><strong>How to use:</strong> Click a game to launch it in a new window.</li>
-            <li><strong>Stealth:</strong> Press ESC at any time to panic-redirect.</li>
-            <li><strong>Favorites:</strong> Click the star to pin games to the top.</li>
-            <li><strong>Deleting:</strong> Click the delete option, once activated any game you click on will be deleted</li>
-            <li><strong>Undo:</strong> Click Undo button, this will undo all the games you have deleted, if a white screen shows up, close tab, and run code again</li>
-        </ul>
-        <p>Site updates every day</p>
-    </div>
+    <span class="close-info" onclick="toggleInfo()" style="position: absolute; right: 30px; cursor: pointer; font-size: 40px;">×</span>
+    <h1>ADDITIONAL INFO</h1>
+    <p>Multi-Delete Mode: Click games to turn them red, then click "Confirm Deletion" to hide them all.</p>
 </div>
-
-<div class="sidebar" id="sidebar-nav"></div>
 
 <div class="main-content" id="main-content">
     <div class="header-container">
@@ -141,13 +123,17 @@
             <button class="top-btn" id="view-toggle" onclick="toggleView()">田 Grid View</button>
             <button class="top-btn" onclick="toggleInfo()">❓ Info</button>
             <button class="top-btn" id="delete-mode-toggle" onclick="toggleDeleteMode()" style="background: #ff4444; color: white;">🗑️ Delete Mode</button>
+            <button class="top-btn" id="confirm-delete-btn" onclick="bulkDelete()" style="background: #ffffff; color: #ff4444; display: none; border: 2px solid #ff4444;">🔥 Confirm Deletion</button>
             <button class="top-btn" onclick="resetDeletedGames()" style="background: #44ff44;">🔄 Undo All</button>
+        </div>
+        <div class="search-container">
+            <input type="text" id="gameSearch" placeholder="Search for a game..." onkeyup="searchGames()">
         </div>
     </div>
 
     <div id="favorites-section">
-        <h2 style="color: gold; border-bottom: 2px solid gold;">⭐ Favorites</h2>
-        <div id="favorites-container" class="buttons-container"></div>
+        <h2 style="color: gold; border-bottom: 2px solid gold; text-align: center;">⭐ Favorites</h2>
+        <div id="favorites-container" class="buttons-container" style="display: flex; flex-direction: column; align-items: center;"></div>
     </div>
 
     <div id="sections-container"></div>
@@ -157,56 +143,59 @@
 
 <script>
     let deleteMode = false;
+    let selectedForDeletion = []; // Stores names of games highlighted red
     let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
     let deletedGames = JSON.parse(localStorage.getItem("deletedGames") || "[]");
 
-    // PANIC REDIRECT
-    document.addEventListener('keydown', (e) => {
-        if (e.key === "Escape") window.location.href = "https://canvas.instructure.com";
-    });
+    function searchGames() {
+        const query = document.getElementById('gameSearch').value.toLowerCase();
+        const gameItems = document.querySelectorAll('#sections-container .game-item');
+        
+        gameItems.forEach(item => {
+            const btn = item.querySelector("input[type='button']");
+            const name = btn.value.toLowerCase();
+            const isDeleted = deletedGames.includes(btn.value);
+            if (name.includes(query) && !isDeleted) {
+                item.style.display = "block";
+            } else {
+                item.style.display = "none";
+            }
+        });
 
-    // VIEW TOGGLE
-    function toggleView() {
-        const content = document.getElementById('main-content');
-        const btn = document.getElementById('view-toggle');
-        const isGrid = content.classList.toggle('grid-view');
-        localStorage.setItem("viewMode", isGrid ? "grid" : "list");
-        btn.innerText = isGrid ? "☰ List View" : "田 Grid View";
-    }
-
-    function toggleInfo() {
-        const overlay = document.getElementById('info-overlay');
-        overlay.style.display = (overlay.style.display === "block") ? "none" : "block";
-    }
-
-    function createParticles(e) {
-        for (let i = 0; i < 8; i++) {
-            const particle = document.createElement("div");
-            particle.className = "particle";
-            document.body.appendChild(particle);
-            const size = Math.random() * 8 + 4;
-            particle.style.width = particle.style.height = `${size}px`;
-            particle.style.left = `${e.clientX}px`;
-            particle.style.top = `${e.clientY}px`;
-            const destX = (Math.random() - 0.5) * 200;
-            const destY = (Math.random() - 0.5) * 200;
-            setTimeout(() => {
-                particle.style.transform = `translate(${destX}px, ${destY}px) scale(0)`;
-                particle.style.opacity = "0";
-            }, 10);
-            setTimeout(() => particle.remove(), 600);
-        }
+        document.querySelectorAll('.letter-header').forEach(header => {
+            const nextContainer = header.nextElementSibling;
+            const visibleGames = nextContainer.querySelectorAll('.game-item[style="display: block;"]');
+            header.style.display = visibleGames.length > 0 ? "block" : "none";
+            nextContainer.style.display = visibleGames.length > 0 ? (document.getElementById('main-content').classList.contains('grid-view') ? "grid" : "flex") : "none";
+        });
     }
 
     function toggleDeleteMode() {
         deleteMode = !deleteMode;
         const btn = document.getElementById('delete-mode-toggle');
+        const confirmBtn = document.getElementById('confirm-delete-btn');
+        
         btn.style.boxShadow = deleteMode ? "0 0 20px #ff4444" : "none";
         btn.innerText = deleteMode ? "🗑️ Mode: ON" : "🗑️ Delete Mode";
+
+        if (!deleteMode) {
+            // Reset everything if they turn mode OFF
+            selectedForDeletion = [];
+            document.querySelectorAll('.game-item').forEach(i => i.classList.remove('selected-delete'));
+            confirmBtn.style.display = "none";
+        }
     }
 
-    function resetDeletedGames() {
-        if (confirm("Restore everything?")) { localStorage.removeItem("deletedGames"); location.reload(); }
+    // New Bulk Delete function
+    function bulkDelete() {
+        if (selectedForDeletion.length === 0) return;
+        if (confirm(`Hide ${selectedForDeletion.length} selected games?`)) {
+            deletedGames = [...deletedGames, ...selectedForDeletion];
+            localStorage.setItem("deletedGames", JSON.stringify(deletedGames));
+            selectedForDeletion = [];
+            document.getElementById('confirm-delete-btn').style.display = "none";
+            renderAll();
+        }
     }
 
     function toggleTheme() {
@@ -225,60 +214,99 @@
     function renderAll() {
         const favContainer = document.getElementById("favorites-container");
         favContainer.innerHTML = "";
-        document.querySelectorAll(".game-item").forEach(item => {
+        document.querySelectorAll("#sections-container .game-item").forEach(item => {
             const btn = item.querySelector("input[type='button']");
-            if (!btn) return;
-            item.style.display = deletedGames.includes(btn.value) ? "none" : "block";
+            const isDeleted = deletedGames.includes(btn.value);
+            item.style.display = isDeleted ? "none" : "block";
+            
+            // Clean up red highlights after a delete
+            item.classList.remove('selected-delete');
+
             const star = item.querySelector(".star");
             if (star) star.classList.toggle("favorited", favorites.includes(btn.value));
-            if (favorites.includes(btn.value) && !deletedGames.includes(btn.value)) {
+            
+            if (favorites.includes(btn.value) && !isDeleted) {
                 const clone = item.cloneNode(true);
                 clone.querySelector("input").onclick = () => btn.click();
                 clone.querySelector(".star").onclick = (e) => { e.stopPropagation(); toggleFavorite(btn.value); };
                 favContainer.appendChild(clone);
             }
         });
+        searchGames();
     }
 
     function setupButtons() {
         document.querySelectorAll("#sections-container input[type='button']").forEach(btn => {
-            if (btn.parentElement.classList.contains("game-item")) return;
             const wrapper = document.createElement("div");
             wrapper.className = "game-item";
             btn.parentNode.insertBefore(wrapper, btn);
             wrapper.appendChild(btn);
+
             const star = document.createElement("span");
             star.innerHTML = "★"; star.className = "star";
             star.onclick = (e) => { e.stopPropagation(); toggleFavorite(btn.value); };
             wrapper.appendChild(star);
+
             const oldClick = btn.onclick;
             btn.onclick = (e) => {
                 if (deleteMode) {
-                    if (confirm(`Hide ${btn.value}?`)) {
-                        deletedGames.push(btn.value);
-                        localStorage.setItem("deletedGames", JSON.stringify(deletedGames));
-                        renderAll();
+                    const name = btn.value;
+                    if (selectedForDeletion.includes(name)) {
+                        // Deselect
+                        selectedForDeletion = selectedForDeletion.filter(n => n !== name);
+                        wrapper.classList.remove('selected-delete');
+                    } else {
+                        // Select
+                        selectedForDeletion.push(name);
+                        wrapper.classList.add('selected-delete');
                     }
+                    // Show/Hide the "Confirm" button
+                    document.getElementById('confirm-delete-btn').style.display = selectedForDeletion.length > 0 ? "inline-block" : "none";
                 } else if (oldClick) oldClick.call(btn, e);
             };
         });
-        const sidebar = document.getElementById("sidebar-nav");
-        document.querySelectorAll(".letter-header").forEach(h => {
-            const a = document.createElement("a");
-            a.className = "nav-letter"; a.innerText = h.innerText;
-            a.href = "#" + (h.id = "sec-" + h.innerText);
-            sidebar.appendChild(a);
-        });
 
-        // LOAD SAVED VIEW PREFERENCE
         if (localStorage.getItem("viewMode") === "grid") toggleView();
-        
         renderAll();
     }
 
+    // Logic for other buttons
+    function toggleView() {
+        const content = document.getElementById('main-content');
+        const btn = document.getElementById('view-toggle');
+        const isGrid = content.classList.toggle('grid-view');
+        localStorage.setItem("viewMode", isGrid ? "grid" : "list");
+        btn.innerText = isGrid ? "☰ List View" : "田 Grid View";
+        const favContainer = document.getElementById("favorites-container");
+        favContainer.style.display = isGrid ? "grid" : "flex";
+        searchGames();
+    }
+
+    function resetDeletedGames() {
+        if (confirm("Restore everything?")) { localStorage.removeItem("deletedGames"); location.reload(); }
+    }
+
+    function toggleInfo() {
+        const overlay = document.getElementById('info-overlay');
+        overlay.style.display = (overlay.style.display === "block") ? "none" : "block";
+    }
+
+    function createParticles(e) {
+        for (let i = 0; i < 8; i++) {
+            const p = document.createElement("div");
+            p.style.position = "fixed"; p.style.width = p.style.height = "8px";
+            p.style.background = "var(--accent-color)"; p.style.borderRadius = "50%";
+            p.style.left = e.clientX + "px"; p.style.top = e.clientY + "px";
+            p.style.pointerEvents = "none"; document.body.appendChild(p);
+            const dx = (Math.random()-0.5)*200, dy = (Math.random()-0.5)*200;
+            p.animate([{transform:'translate(0,0)', opacity:1}, {transform:`translate(${dx}px,${dy}px)`, opacity:0}], {duration:600});
+            setTimeout(() => p.remove(), 600);
+        }
+    }
+
+    document.addEventListener('keydown', (e) => { if (e.key === "Escape") window.location.href = "https://canvas.instructure.com"; });
     document.documentElement.setAttribute("data-theme", localStorage.getItem("theme") || "dark");
     setTimeout(setupButtons, 1200);
 </script>
-
 </body>
 </html>
