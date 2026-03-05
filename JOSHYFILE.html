@@ -25,7 +25,6 @@
             --accent-color: #5a189a;
             --btn-bg: linear-gradient(145deg, #5a189a, #3c096c);
             --btn-hover: linear-gradient(145deg, #7b2cbf, #5a189a);
-            --card-shadow: rgba(0,0,0,0.1);
         }
 
         body {
@@ -33,189 +32,121 @@
             background: var(--bg-gradient);
             color: var(--text-color);
             min-height: 100vh;
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             display: flex;
+            overflow-x: hidden;
             transition: background 0.3s ease;
+        }
+
+        /* CLICK PARTICLES */
+        .particle {
+            position: fixed; top: 0; left: 0; width: 8px; height: 8px;
+            background: var(--accent-color); border-radius: 50%;
+            pointer-events: none; z-index: 9999;
+            transition: transform 0.6s ease-out, opacity 0.6s ease-out;
         }
 
         /* SIDEBAR */
         .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 60px;
-            height: 100vh;
-            background: var(--sidebar-bg);
-            backdrop-filter: blur(12px);
-            padding: 20px 5px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: 2px 0 15px var(--card-shadow);
+            position: fixed; left: 0; top: 0; width: 60px; height: 100vh;
+            background: var(--sidebar-bg); backdrop-filter: blur(12px);
+            padding: 20px 5px; display: flex; flex-direction: column;
+            align-items: center; gap: 5px; z-index: 1000;
         }
 
         .nav-letter {
-            color: var(--accent-color);
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 14px;
-            padding: 8px;
-            width: 30px;
-            text-align: center;
-            border-radius: 5px;
-            transition: 0.2s;
+            color: var(--accent-color); text-decoration: none; font-weight: bold;
+            font-size: 14px; padding: 8px; width: 30px; text-align: center;
+            border-radius: 5px; transition: 0.2s;
         }
-        .nav-letter:hover { transform: scale(1.2); color: var(--text-color); }
 
         /* MAIN CONTENT */
-        .main-content {
-            margin-left: 80px;
-            flex: 1;
-            padding: 20px;
-        }
+        .main-content { margin-left: 80px; flex: 1; padding: 20px; }
+        .header-container { text-align: center; margin-bottom: 30px; }
+        .controls-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
 
-        .header-container {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        h1 { text-shadow: 0 0 15px rgba(200,150,255,0.4); }
-
-        /* SEARCH STYLES */
-        .search-container {
-            margin: 20px auto;
-            max-width: 600px;
-        }
-        #game-search {
-            width: 100%;
-            padding: 12px 20px;
-            border-radius: 25px;
-            border: 2px solid var(--accent-color);
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-color);
-            font-size: 16px;
-            outline: none;
-            transition: 0.3s;
-        }
-        #game-search:focus { background: rgba(255,255,255, 0.2); box-shadow: 0 0 10px var(--accent-color); }
-
-        .controls-row {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-            margin-top: 15px;
-        }
-
-        /* BUTTONS */
         .top-btn {
-            background: #ffaa00;
-            color: #2e1a47;
-            border: none;
-            padding: 10px 20px;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 4px 10px rgba(255, 170, 0, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .top-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(255, 170, 0, 0.5); }
-        .dice-btn { font-size: 20px; padding: 8px 15px; }
-
-        /* GAME STYLES */
-        .letter-header {
-            color: var(--accent-color) !important;
-            font-size: 32px;
-            margin: 40px 0 20px 0;
-            border-bottom: 2px solid var(--accent-color);
-            scroll-margin-top: 20px;
+            background: #ffaa00; color: #2e1a47; border: none;
+            padding: 10px 20px; font-weight: bold; border-radius: 50px;
+            cursor: pointer; transition: 0.3s;
         }
 
-        .buttons-container { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            align-items: center; 
+        /* ADDITIONAL INFO OVERLAY */
+        #info-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-gradient); z-index: 2000;
+            display: none; padding: 50px; box-sizing: border-box;
+            overflow-y: auto;
         }
+        .close-info { position: absolute; top: 20px; right: 30px; font-size: 40px; cursor: pointer; color: var(--accent-color); }
 
-        /* GRID VIEW STYLES */
+        /* GAME STYLES (LIST & GRID) */
+        .buttons-container { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+        
         .grid-view .buttons-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
-            align-items: stretch;
-            max-width: 1200px;
-            margin: 0 auto;
+            gap: 15px; align-items: stretch; width: 100%;
         }
 
-        .game-item { position: relative; width: 100%; max-width: 600px; transition: transform 0.2s; }
-        
+        .game-item { position: relative; width: 100%; max-width: 600px; }
         .grid-view .game-item { max-width: none; }
+        
+        input[type="button"] {
+            background: var(--btn-bg); border: none; padding: 15px 45px 15px 20px;
+            font-size: 16px; border-radius: 10px; cursor: pointer;
+            width: 100%; color: white; text-align: left; transition: 0.2s;
+        }
 
         .grid-view input[type="button"] {
-            height: 100px;
-            text-align: center;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            white-space: normal;
-            line-height: 1.2;
+            height: 100px; text-align: center; padding: 10px;
+            display: flex; align-items: center; justify-content: center;
+            white-space: normal; line-height: 1.2;
         }
 
-        input[type="button"] {
-            background: var(--btn-bg);
-            border: none;
-            padding: 15px 45px 15px 20px;
-            font-size: 16px;
-            border-radius: 10px;
-            cursor: pointer;
-            width: 100%;
-            color: white;
-            text-align: left;
-            transition: 0.2s;
-            box-sizing: border-box;
-        }
-        input[type="button"]:hover { background: var(--btn-hover); transform: scale(1.02); }
-
-        .star { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 20px; cursor: pointer; color: rgba(255, 255, 255, 0.3); z-index: 5; }
+        .star { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 20px; cursor: pointer; color: rgba(255,255,255,0.3); z-index: 5; }
         .star.favorited { color: gold; }
-        
-        #favorites-section h2 { color: gold; border-bottom: 2px solid gold; }
+
+        .letter-header {
+            color: var(--accent-color); font-size: 32px; margin: 40px 0 20px 0;
+            border-bottom: 2px solid var(--accent-color);
+        }
     </style>
 </head>
-<body>
+<body onclick="createParticles(event)">
+
+<div id="info-overlay">
+    <span class="close-info" onclick="toggleInfo()">×</span>
+    <h1 style="color: var(--accent-color); border-bottom: 2px solid var(--accent-color);">ADDITIONAL INFO</h1>
+    <div style="font-size: 18px; line-height: 1.6; max-width: 800px;">
+        <p>This page includes features of the site and how to use them</p>
+        <ul>
+            <li><strong>How to use:</strong> Click a game to launch it in a new window.</li>
+            <li><strong>Stealth:</strong> Press ESC at any time to panic-redirect.</li>
+            <li><strong>Favorites:</strong> Click the star to pin games to the top.</li>
+            <li><strong>Deleting:</strong> Click the delete option, once activated any game you click on will be deleted</li>
+            <li><strong>Undo:</strong> Click Undo button, this will undo all the games you have deleted, if a white screen shows up, close tab, and run code again</li>
+        </ul>
+        <p>Site updates every day</p>
+    </div>
+</div>
 
 <div class="sidebar" id="sidebar-nav"></div>
 
 <div class="main-content" id="main-content">
     <div class="header-container">
         <h1>Made by JOSHY</h1>
-        
-        <div class="search-container">
-            <input type="text" id="game-search" placeholder="Search for a game..." onkeyup="filterGames()">
-        </div>
-
         <div class="controls-row">
+            <button class="top-btn" onclick="toggleTheme()">🌙 Mode</button>
             <button class="top-btn" id="view-toggle" onclick="toggleView()">田 Grid View</button>
-            <button class="top-btn dice-btn" onclick="playRandomGame()" title="Random Game">🎲</button>
-            <button class="top-btn" id="theme-toggle" onclick="toggleTheme()">🌙 Mode</button>
-            <button class="top-btn" id="delete-mode-toggle" onclick="toggleDeleteMode()" style="background: #ff4444; color: white;">🗑️ Delete Mode: OFF</button>
-            <button class="top-btn" onclick="resetDeletedGames()" style="background: #44ff44; color: #1a1a1a;">🔄 Undo All</button>
+            <button class="top-btn" onclick="toggleInfo()">❓ Info</button>
+            <button class="top-btn" id="delete-mode-toggle" onclick="toggleDeleteMode()" style="background: #ff4444; color: white;">🗑️ Delete Mode</button>
+            <button class="top-btn" onclick="resetDeletedGames()" style="background: #44ff44;">🔄 Undo All</button>
         </div>
     </div>
 
     <div id="favorites-section">
-        <h2>⭐ Favorites</h2>
+        <h2 style="color: gold; border-bottom: 2px solid gold;">⭐ Favorites</h2>
         <div id="favorites-container" class="buttons-container"></div>
     </div>
 
@@ -225,38 +156,14 @@
 <script src="https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile@main/games.js"></script>
 
 <script>
-    let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
     let deleteMode = false;
+    let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
     let deletedGames = JSON.parse(localStorage.getItem("deletedGames") || "[]");
 
-    // PANIC KEY: Redirect to Canvas on ESC
+    // PANIC REDIRECT
     document.addEventListener('keydown', (e) => {
         if (e.key === "Escape") window.location.href = "https://canvas.instructure.com";
     });
-
-    // DELETE MODE LOGIC
-    function toggleDeleteMode() {
-        deleteMode = !deleteMode;
-        const btn = document.getElementById('delete-mode-toggle');
-        btn.innerText = deleteMode ? "🗑️ Delete Mode: ON" : "🗑️ Delete Mode: OFF";
-        btn.style.boxShadow = deleteMode ? "0 0 20px #ff4444" : "none";
-    }
-
-    function resetDeletedGames() {
-        if (confirm("Restore all hidden games?")) {
-            localStorage.removeItem("deletedGames");
-            location.reload();
-        }
-    }
-
-    function applyDeletions() {
-        document.querySelectorAll(".game-item").forEach(item => {
-            const btn = item.querySelector("input[type='button']");
-            if (btn && deletedGames.includes(btn.value)) {
-                item.style.display = "none";
-            }
-        });
-    }
 
     // VIEW TOGGLE
     function toggleView() {
@@ -267,132 +174,110 @@
         btn.innerText = isGrid ? "☰ List View" : "田 Grid View";
     }
 
-    if (localStorage.getItem("viewMode") === "grid") {
-        document.getElementById('main-content').classList.add('grid-view');
-        document.getElementById('view-toggle').innerText = "☰ List View";
+    function toggleInfo() {
+        const overlay = document.getElementById('info-overlay');
+        overlay.style.display = (overlay.style.display === "block") ? "none" : "block";
     }
 
-    // SEARCH
-    function filterGames() {
-        const query = document.getElementById('game-search').value.toLowerCase();
-        const gameItems = document.querySelectorAll('#sections-container .game-item');
-        
-        gameItems.forEach(item => {
-            const btn = item.querySelector('input[type="button"]');
-            const isMatch = btn.value.toLowerCase().includes(query) && !deletedGames.includes(btn.value);
-            item.style.display = isMatch ? "block" : "none";
-        });
-    }
-
-    // THEME
-    function toggleTheme() {
-        const currentTheme = document.documentElement.getAttribute("data-theme");
-        const newTheme = currentTheme === "light" ? "dark" : "light";
-        document.documentElement.setAttribute("data-theme", newTheme);
-        localStorage.setItem("theme", newTheme);
-        document.getElementById("theme-toggle").innerText = newTheme === "light" ? "☀️ Mode" : "🌙 Mode";
-    }
-
-    const savedTheme = localStorage.getItem("theme") || "dark";
-    document.documentElement.setAttribute("data-theme", savedTheme);
-
-    // FAVORITES
-    function toggleFavorite(btnValue) {
-        if (favorites.includes(btnValue)) {
-            favorites = favorites.filter(f => f !== btnValue);
-        } else {
-            favorites.push(btnValue);
+    function createParticles(e) {
+        for (let i = 0; i < 8; i++) {
+            const particle = document.createElement("div");
+            particle.className = "particle";
+            document.body.appendChild(particle);
+            const size = Math.random() * 8 + 4;
+            particle.style.width = particle.style.height = `${size}px`;
+            particle.style.left = `${e.clientX}px`;
+            particle.style.top = `${e.clientY}px`;
+            const destX = (Math.random() - 0.5) * 200;
+            const destY = (Math.random() - 0.5) * 200;
+            setTimeout(() => {
+                particle.style.transform = `translate(${destX}px, ${destY}px) scale(0)`;
+                particle.style.opacity = "0";
+            }, 10);
+            setTimeout(() => particle.remove(), 600);
         }
-        localStorage.setItem("favorites", JSON.stringify(favorites));
-        updateStarUI();
-        renderFavorites();
     }
 
-    function renderFavorites() {
-        const container = document.getElementById("favorites-container");
-        container.innerHTML = "";
-        favorites.forEach(name => {
-            if (deletedGames.includes(name)) return;
-            const allBtns = [...document.querySelectorAll("#sections-container input[type='button']")];
-            const original = allBtns.find(btn => btn.value === name);
-            if (original) {
-                const wrapper = document.createElement("div");
-                wrapper.className = "game-item";
-                const clone = original.cloneNode(true);
-                clone.onclick = () => original.click();
-                const star = document.createElement("span");
-                star.innerHTML = "★";
-                star.className = "star favorited";
-                star.onclick = (e) => { e.stopPropagation(); toggleFavorite(name); };
-                wrapper.appendChild(clone);
-                wrapper.appendChild(star);
-                container.appendChild(wrapper);
+    function toggleDeleteMode() {
+        deleteMode = !deleteMode;
+        const btn = document.getElementById('delete-mode-toggle');
+        btn.style.boxShadow = deleteMode ? "0 0 20px #ff4444" : "none";
+        btn.innerText = deleteMode ? "🗑️ Mode: ON" : "🗑️ Delete Mode";
+    }
+
+    function resetDeletedGames() {
+        if (confirm("Restore everything?")) { localStorage.removeItem("deletedGames"); location.reload(); }
+    }
+
+    function toggleTheme() {
+        const t = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", t);
+        localStorage.setItem("theme", t);
+    }
+
+    function toggleFavorite(name) {
+        if (favorites.includes(name)) favorites = favorites.filter(f => f !== name);
+        else favorites.push(name);
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+        renderAll();
+    }
+
+    function renderAll() {
+        const favContainer = document.getElementById("favorites-container");
+        favContainer.innerHTML = "";
+        document.querySelectorAll(".game-item").forEach(item => {
+            const btn = item.querySelector("input[type='button']");
+            if (!btn) return;
+            item.style.display = deletedGames.includes(btn.value) ? "none" : "block";
+            const star = item.querySelector(".star");
+            if (star) star.classList.toggle("favorited", favorites.includes(btn.value));
+            if (favorites.includes(btn.value) && !deletedGames.includes(btn.value)) {
+                const clone = item.cloneNode(true);
+                clone.querySelector("input").onclick = () => btn.click();
+                clone.querySelector(".star").onclick = (e) => { e.stopPropagation(); toggleFavorite(btn.value); };
+                favContainer.appendChild(clone);
             }
         });
     }
 
-    function updateStarUI() {
-        document.querySelectorAll(".game-item .star").forEach(star => {
-            const btn = star.parentElement.querySelector("input[type='button']");
-            if (btn) star.classList.toggle("favorited", favorites.includes(btn.value));
-        });
-    }
-
-    // SIDEBAR
-    function buildSidebarNav() {
-        const sidebar = document.getElementById("sidebar-nav");
-        sidebar.innerHTML = "";
-        document.querySelectorAll(".letter-header").forEach(header => {
-            const letter = header.innerText.trim();
-            header.id = "section-" + letter;
-            const navLink = document.createElement("a");
-            navLink.href = "#section-" + letter;
-            navLink.className = "nav-letter";
-            navLink.innerText = letter;
-            sidebar.appendChild(navLink);
-        });
-    }
-
-    // INITIALIZE BUTTONS
-    function enhanceButtons() {
-        const buttons = document.querySelectorAll("#sections-container input[type='button']");
-        buttons.forEach(btn => {
+    function setupButtons() {
+        document.querySelectorAll("#sections-container input[type='button']").forEach(btn => {
             if (btn.parentElement.classList.contains("game-item")) return;
             const wrapper = document.createElement("div");
             wrapper.className = "game-item";
             btn.parentNode.insertBefore(wrapper, btn);
             wrapper.appendChild(btn);
-
-            // Add Star
             const star = document.createElement("span");
-            star.innerHTML = "★";
-            star.className = "star";
+            star.innerHTML = "★"; star.className = "star";
             star.onclick = (e) => { e.stopPropagation(); toggleFavorite(btn.value); };
             wrapper.appendChild(star);
-
-            // Add Delete Interceptor
-            const originalClick = btn.onclick;
+            const oldClick = btn.onclick;
             btn.onclick = (e) => {
                 if (deleteMode) {
-                    e.preventDefault();
-                    if (confirm(`Hide ${btn.value} permanently?`)) {
+                    if (confirm(`Hide ${btn.value}?`)) {
                         deletedGames.push(btn.value);
                         localStorage.setItem("deletedGames", JSON.stringify(deletedGames));
-                        applyDeletions();
-                        renderFavorites();
+                        renderAll();
                     }
-                } else if (originalClick) {
-                    originalClick.call(btn, e);
-                }
+                } else if (oldClick) oldClick.call(btn, e);
             };
         });
-        buildSidebarNav();
-        updateStarUI();
-        applyDeletions();
-        renderFavorites();
+        const sidebar = document.getElementById("sidebar-nav");
+        document.querySelectorAll(".letter-header").forEach(h => {
+            const a = document.createElement("a");
+            a.className = "nav-letter"; a.innerText = h.innerText;
+            a.href = "#" + (h.id = "sec-" + h.innerText);
+            sidebar.appendChild(a);
+        });
+
+        // LOAD SAVED VIEW PREFERENCE
+        if (localStorage.getItem("viewMode") === "grid") toggleView();
+        
+        renderAll();
     }
 
-    setTimeout(enhanceButtons, 1200);
+    document.documentElement.setAttribute("data-theme", localStorage.getItem("theme") || "dark");
+    setTimeout(setupButtons, 1200);
 </script>
 
 </body>
