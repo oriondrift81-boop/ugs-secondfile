@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UGS Files - JOSHY Edition</title>
+    <title>VortexStash - JOSHY Edition</title>
     <style>
         html { scroll-behavior: smooth; }
 
@@ -13,7 +13,6 @@
             --text-color: #ffffff;
             --accent-color: #d8b4ff;
             --btn-bg: linear-gradient(145deg, #7b2cbf, #5a189a);
-            --btn-hover: linear-gradient(145deg, #9d4edd, #7b2cbf);
             --delete-red: #ff4444;
         }
 
@@ -22,7 +21,6 @@
             --text-color: #1a1a1a;
             --accent-color: #5a189a;
             --btn-bg: linear-gradient(145deg, #5a189a, #3c096c);
-            --btn-hover: linear-gradient(145deg, #7b2cbf, #5a189a);
         }
 
         body {
@@ -36,19 +34,37 @@
             transition: background 0.3s ease;
         }
 
-        /* STICKY HEADER */
-        .header-container { 
-            position: sticky; 
-            top: 0; 
-            z-index: 100; 
-            background: var(--bg-gradient); 
-            padding: 20px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+        /* HEADER AREA (Scrolls away) */
+        .header-main {
             text-align: center;
+            padding: 40px 20px 20px;
+        }
+
+        .neon-title {
+            margin: 0;
+            font-size: 3.5rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 
+                0 0 7px #fff,
+                0 0 15px var(--accent-color),
+                0 0 30px var(--accent-color);
+        }
+
+        /* STICKY CONTROLS (Only the buttons stay at the top) */
+        .sticky-controls {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--bg-gradient);
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .search-container {
-            margin: 15px auto 0;
+            margin: 20px auto;
             width: 90%;
             max-width: 500px;
         }
@@ -65,7 +81,7 @@
         }
 
         .main-content { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .controls-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        .controls-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
 
         .top-btn {
             background: #ffaa00; color: #2e1a47; border: none;
@@ -75,7 +91,6 @@
 
         /* GAME ITEMS */
         .game-item { position: relative; width: 100%; max-width: 600px; margin: 0 auto 10px; }
-        
         .grid-view .buttons-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -88,7 +103,6 @@
             width: 100%; color: white; text-align: left; transition: 0.2s;
         }
 
-        /* RED HIGHLIGHT FOR MULTI-DELETE */
         .game-item.selected-delete input[type="button"] {
             background: var(--delete-red) !important;
             box-shadow: 0 0 15px var(--delete-red);
@@ -111,31 +125,40 @@
 
 <div id="info-overlay">
     <span class="close-info" onclick="toggleInfo()" style="position: absolute; right: 30px; cursor: pointer; font-size: 40px;">×</span>
-    <h1>ADDITIONAL INFO</h1>
-    <p>Multi-Delete Mode: Click games to turn them red, then click "Confirm Deletion" to hide them all.</p>
+    <h1>VortexStash Info</h1>
+    <p><em>made by joshy</em></p>
+    <ul>
+        <li>Select games in Delete Mode to highlight red.</li>
+        <li>Click 'Confirm Deletion' to hide selected items.</li>
+        <li>Press ESC to go to Canvas.</li>
+    </ul>
+</div>
+
+<div class="header-main">
+    <h1 class="neon-title">VortexStash</h1>
+    <p style="font-style: italic; color: var(--accent-color); margin-top: 10px;">made by joshy</p>
+    
+    <div class="search-container">
+        <input type="text" id="gameSearch" placeholder="Search the stash..." onkeyup="searchGames()">
+    </div>
+</div>
+
+<div class="sticky-controls">
+    <div class="controls-row">
+        <button class="top-btn" onclick="toggleTheme()">🌙 Mode</button>
+        <button class="top-btn" id="view-toggle" onclick="toggleView()">田 Grid View</button>
+        <button class="top-btn" onclick="toggleInfo()">❓ Info</button>
+        <button class="top-btn" id="delete-mode-toggle" onclick="toggleDeleteMode()" style="background: #ff4444; color: white;">🗑️ Delete Mode</button>
+        <button class="top-btn" id="confirm-delete-btn" onclick="bulkDelete()" style="background: #ffffff; color: #ff4444; display: none; border: 2px solid #ff4444;">🔥 Confirm Deletion</button>
+        <button class="top-btn" onclick="resetDeletedGames()" style="background: #44ff44;">🔄 Undo All</button>
+    </div>
 </div>
 
 <div class="main-content" id="main-content">
-    <div class="header-container">
-        <h1>Made by JOSHY</h1>
-        <div class="controls-row">
-            <button class="top-btn" onclick="toggleTheme()">🌙 Mode</button>
-            <button class="top-btn" id="view-toggle" onclick="toggleView()">田 Grid View</button>
-            <button class="top-btn" onclick="toggleInfo()">❓ Info</button>
-            <button class="top-btn" id="delete-mode-toggle" onclick="toggleDeleteMode()" style="background: #ff4444; color: white;">🗑️ Delete Mode</button>
-            <button class="top-btn" id="confirm-delete-btn" onclick="bulkDelete()" style="background: #ffffff; color: #ff4444; display: none; border: 2px solid #ff4444;">🔥 Confirm Deletion</button>
-            <button class="top-btn" onclick="resetDeletedGames()" style="background: #44ff44;">🔄 Undo All</button>
-        </div>
-        <div class="search-container">
-            <input type="text" id="gameSearch" placeholder="Search for a game..." onkeyup="searchGames()">
-        </div>
-    </div>
-
     <div id="favorites-section">
         <h2 style="color: gold; border-bottom: 2px solid gold; text-align: center;">⭐ Favorites</h2>
         <div id="favorites-container" class="buttons-container" style="display: flex; flex-direction: column; align-items: center;"></div>
     </div>
-
     <div id="sections-container"></div>
 </div>
 
@@ -143,25 +166,19 @@
 
 <script>
     let deleteMode = false;
-    let selectedForDeletion = []; // Stores names of games highlighted red
+    let selectedForDeletion = [];
     let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
     let deletedGames = JSON.parse(localStorage.getItem("deletedGames") || "[]");
 
     function searchGames() {
         const query = document.getElementById('gameSearch').value.toLowerCase();
         const gameItems = document.querySelectorAll('#sections-container .game-item');
-        
         gameItems.forEach(item => {
             const btn = item.querySelector("input[type='button']");
             const name = btn.value.toLowerCase();
             const isDeleted = deletedGames.includes(btn.value);
-            if (name.includes(query) && !isDeleted) {
-                item.style.display = "block";
-            } else {
-                item.style.display = "none";
-            }
+            item.style.display = (name.includes(query) && !isDeleted) ? "block" : "none";
         });
-
         document.querySelectorAll('.letter-header').forEach(header => {
             const nextContainer = header.nextElementSibling;
             const visibleGames = nextContainer.querySelectorAll('.game-item[style="display: block;"]');
@@ -174,19 +191,15 @@
         deleteMode = !deleteMode;
         const btn = document.getElementById('delete-mode-toggle');
         const confirmBtn = document.getElementById('confirm-delete-btn');
-        
         btn.style.boxShadow = deleteMode ? "0 0 20px #ff4444" : "none";
         btn.innerText = deleteMode ? "🗑️ Mode: ON" : "🗑️ Delete Mode";
-
         if (!deleteMode) {
-            // Reset everything if they turn mode OFF
             selectedForDeletion = [];
             document.querySelectorAll('.game-item').forEach(i => i.classList.remove('selected-delete'));
             confirmBtn.style.display = "none";
         }
     }
 
-    // New Bulk Delete function
     function bulkDelete() {
         if (selectedForDeletion.length === 0) return;
         if (confirm(`Hide ${selectedForDeletion.length} selected games?`)) {
@@ -196,12 +209,6 @@
             document.getElementById('confirm-delete-btn').style.display = "none";
             renderAll();
         }
-    }
-
-    function toggleTheme() {
-        const t = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
-        document.documentElement.setAttribute("data-theme", t);
-        localStorage.setItem("theme", t);
     }
 
     function toggleFavorite(name) {
@@ -218,13 +225,9 @@
             const btn = item.querySelector("input[type='button']");
             const isDeleted = deletedGames.includes(btn.value);
             item.style.display = isDeleted ? "none" : "block";
-            
-            // Clean up red highlights after a delete
             item.classList.remove('selected-delete');
-
             const star = item.querySelector(".star");
             if (star) star.classList.toggle("favorited", favorites.includes(btn.value));
-            
             if (favorites.includes(btn.value) && !isDeleted) {
                 const clone = item.cloneNode(true);
                 clone.querySelector("input").onclick = () => btn.click();
@@ -241,56 +244,47 @@
             wrapper.className = "game-item";
             btn.parentNode.insertBefore(wrapper, btn);
             wrapper.appendChild(btn);
-
             const star = document.createElement("span");
             star.innerHTML = "★"; star.className = "star";
             star.onclick = (e) => { e.stopPropagation(); toggleFavorite(btn.value); };
             wrapper.appendChild(star);
-
             const oldClick = btn.onclick;
             btn.onclick = (e) => {
                 if (deleteMode) {
                     const name = btn.value;
                     if (selectedForDeletion.includes(name)) {
-                        // Deselect
                         selectedForDeletion = selectedForDeletion.filter(n => n !== name);
                         wrapper.classList.remove('selected-delete');
                     } else {
-                        // Select
                         selectedForDeletion.push(name);
                         wrapper.classList.add('selected-delete');
                     }
-                    // Show/Hide the "Confirm" button
                     document.getElementById('confirm-delete-btn').style.display = selectedForDeletion.length > 0 ? "inline-block" : "none";
                 } else if (oldClick) oldClick.call(btn, e);
             };
         });
-
         if (localStorage.getItem("viewMode") === "grid") toggleView();
         renderAll();
     }
 
-    // Logic for other buttons
+    function toggleTheme() {
+        const t = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", t);
+        localStorage.setItem("theme", t);
+    }
+
     function toggleView() {
         const content = document.getElementById('main-content');
         const btn = document.getElementById('view-toggle');
         const isGrid = content.classList.toggle('grid-view');
         localStorage.setItem("viewMode", isGrid ? "grid" : "list");
         btn.innerText = isGrid ? "☰ List View" : "田 Grid View";
-        const favContainer = document.getElementById("favorites-container");
-        favContainer.style.display = isGrid ? "grid" : "flex";
+        document.getElementById("favorites-container").style.display = isGrid ? "grid" : "flex";
         searchGames();
     }
 
-    function resetDeletedGames() {
-        if (confirm("Restore everything?")) { localStorage.removeItem("deletedGames"); location.reload(); }
-    }
-
-    function toggleInfo() {
-        const overlay = document.getElementById('info-overlay');
-        overlay.style.display = (overlay.style.display === "block") ? "none" : "block";
-    }
-
+    function resetDeletedGames() { if (confirm("Restore everything?")) { localStorage.removeItem("deletedGames"); location.reload(); } }
+    function toggleInfo() { const overlay = document.getElementById('info-overlay'); overlay.style.display = (overlay.style.display === "block") ? "none" : "block"; }
     function createParticles(e) {
         for (let i = 0; i < 8; i++) {
             const p = document.createElement("div");
@@ -303,7 +297,6 @@
             setTimeout(() => p.remove(), 600);
         }
     }
-
     document.addEventListener('keydown', (e) => { if (e.key === "Escape") window.location.href = "https://canvas.instructure.com"; });
     document.documentElement.setAttribute("data-theme", localStorage.getItem("theme") || "dark");
     setTimeout(setupButtons, 1200);
